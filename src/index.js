@@ -1,6 +1,6 @@
-  //Global variables
-  const URL = "http://localhost:3000/ducks"
-  let selectedDuck;
+//Global variables
+const URL = "http://localhost:3000/ducks";
+let selectedDuck; //for stretch
 
 //Fetch
 // window.addEventListener("DOMContentLoaded", (event) => {
@@ -15,60 +15,72 @@
 //         }
 //     })
 //   });
+//Dom Selectors
+const duckNav = document.querySelector("#duck-nav");
+const duckDisplayName = document.querySelector("#duck-display-name");
+const duckDisplayImage = document.querySelector("#duck-display-image");
+const duckDisplayLikes = document.querySelector("#duck-display-likes");
+const newDuckForm = document.querySelector("#new-duck-form");
+//const ducklikes = document.querySelector('likes')
+
+
   function getAllDucks(url){
-    return fetch(url)
-    .then(res => res.json())
+    return fetch(url).then((res) => res.json());
   }
  
-//Dom Selectors
-  const duckNav = document.querySelector("#duck-nav")
-  const duckName = document.querySelector("#duck-display-name")
-  const duckDetailImg = document.querySelector("#duck-display-image")
-  const duckLikesButton = document.querySelector("#duck-display-likes")
-  const form = document.querySelector("new-duck-form")
-  const ducklikes = document.querySelector('likes')
-
 
 //Event Listeners
 //duckNav.addEventListener('click', renderDuckDetail)
-//form.addEventListener('submit', addNewDuck)
-//duckLikesButton.addEventListener('click,' addLikes)
+
+duckDisplayLikes.addEventListener("click", handleAddLikes)
+newDuckForm.addEventListener("submit", handleDuckSumbit)
 
 //Event Handlers
-function addLikes(e){
-  e.preventDefault()
-  console.dir(e.target)
-  console.log('duckLikes:', duckLikes.value);
-  const newLike = parseInt(duckLikes.value)
-  selectedDuck.likes += newLike
-  renderDetail (selectedDuck)
-}
-//Render Functions
-function renderInNav(duckObj) { //or is it function renderInNav(imgUrl) {
-    const duckImg = document.createElement('img');
-    duckImg.src = duckObj.img_url
-    duckImg.addEventListener('click', () => {renderDuckDetail(duckObj)})
-    document.querySelector("#duck-nav").appendChild(duckImg)
+function handleAddLikes(){
+  selectedDuck.likes += 1
+  renderDuckInDisplay(selectedDuck);
 }
 
-function renderDuckDetail(duckObj) {
+function handleDuckSumbit(e){   
+  e.preventDefault()
+  const input = document.querySelector('#duck-nav')
+  const name = e.target["duck-name-input"].value
+  const img_url = e.target["duck-image-input"].value
+  const newDuck = {
+    name,
+    img_url,
+    likes: 0
+ //I don't know
+}; 
+renderOneDuckInNav(newDuck) //adds duck to nav
+e.target.reset() //clears form for the next one
+}
+
+//Render Functions
+function renderAllDucksInNav(duckArr) {
+  duckArr.forEach(renderOneDuckInNav);
+
+}
+function renderOneDuckInNav(duckObj){
+  const duckImg = document.createElement('img');
+  duckImg.src = duckObj.img_url
+  duckImg.addEventListener('click', () => renderDuckInDisplay(duckObj));
+  duckNav.append(duckImg)
+}
+function renderDuckInDisplay(duckObj) {
   selectedDuck = duckObj;
-  duckName.textContent = duckObj.name
-  duckDetailImg.src = duckObj.image_url
+  duckDisplayName.textContent = duckObj.name
+  duckDisplayImage.src = duckObj.img_url
+  duckDisplayLikes.textContent = `${duckObj.likes} likes`
 // do we need a separate function for fetching 
 //the duck object corresponding to the ID? to return duck name when clicked 
 }
 
-function addNewDuck(e){
-  e.preventDefault()
-  const input = document.querySelector('#duck-nav')
-  //I don't know
-}
+
+
+
 //increment the number of likes
 //Initializer
-getAllDucks(URL).then(duckArr => {
-  renderDuckDetail(duckArr[0]);
-  duckArr.forEach(renderInNav)
-  duckName.innerHTML = ''
-  //duckDetailImg.img_url = ''
+getAllDucks(URL).then((duckArr) => {
+  renderAllDucksInNav(duckArr);
 })
